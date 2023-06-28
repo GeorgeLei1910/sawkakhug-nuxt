@@ -1,0 +1,32 @@
+@charset "utf-8";
+/* CSS Document */
+.home{
+	vertical-align: top;
+	display: inline-block;
+	margin: auto;
+	min-width: 300px;
+}
+h3 {
+	padding: 0 20px;
+	font-size: 24pt;
+	color: #717070;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+p {
+	font-size: 20px;
+	padding: 0 20px;
+	color: #B3B3B3;
+}
+
+@media (min-width: 780px){
+	.home{
+		width: calc(50% - 3px);
+	}	
+}
+@media (max-width: 780px){
+	.home{
+		width: 100%;
+	}	
+}
+

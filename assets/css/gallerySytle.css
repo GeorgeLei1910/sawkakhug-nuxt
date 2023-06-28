@@ -1,0 +1,24 @@
+/* CSS Document */
+
+.item{
+	width: 25%;
+	min-width: 300px;
+}
+.gallery_container{
+	width: 100%;
+	display: flex;
+	flex: auto;
+	clear: both;
+	flex-flow: row wrap;
+	justify-content: space-around;
+}
+.gallery_pictures{
+	width: 16%;
+	min-width: 300px;
+}
+
+.gallery_pictures img{
+	width: 100%;
+	padding: 10px 0;
+	
+}
