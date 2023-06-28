@@ -2,8 +2,11 @@
   @import url("~/assets/css/homepagestyle.css");
   @import url("~/assets/css/homepage.component.css");
 </style>
-<script>
-  import "@ptkdev/webcomponent-instagram-widget";
+
+<script setup>
+  useHead({
+    script: [{ src: "https://cdn.lightwidget.com/widgets/lightwidget.js" }]
+  });
 </script>
 
 <template> 
@@ -17,8 +20,8 @@
     </video>
   </div>
   <div class="home">
-    <!-- <client-only aria-placeholder="Loading ...">
-      <instagram-widget username="@sawkakhug" grid="3x3"></instagram-widget>
-    </client-only> -->
+    <ClientOnly>
+  <iframe src="https://lightwidget.com/widgets/56cbc53dee5b5bbdbd56a6501aeef396.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width:100%;border:0;overflow:hidden;"></iframe>
+</ClientOnly>
   </div>
 </template>
