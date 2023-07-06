@@ -1,5 +1,4 @@
-<style>
-  @import url("~/assets/css/headerfooterStyle.css");
+<style scoped>
   @import url("~/assets/css/footer.component.css");
 </style>
 <template>

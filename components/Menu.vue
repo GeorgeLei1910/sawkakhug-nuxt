@@ -1,5 +1,5 @@
-<style>
-    @import url("~/assets/css/menu.component.css");
+<style scoped>
+    @import url("../assets/css/menu.component.css");
 </style>
 <template>
     <header>

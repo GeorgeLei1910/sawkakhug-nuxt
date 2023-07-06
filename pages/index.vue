@@ -1,4 +1,4 @@
-<style>
+<style scoped>
   @import url("~/assets/css/homepagestyle.css");
   @import url("~/assets/css/homepage.component.css");
 </style>

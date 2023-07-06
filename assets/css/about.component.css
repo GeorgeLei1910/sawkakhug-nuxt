@@ -7,7 +7,6 @@
 }
 .imgbox{
 	margin: 10px;
-	padding: 0 10px;
 	width: 200px;
 	height: 200px;
 }
@@ -30,7 +29,6 @@
 	flex-wrap: wrap;
 	justify-content: space-between;
 	float: right;
-	padding: 10px 0;
 }
 .fiddy{
 	flex:1;
