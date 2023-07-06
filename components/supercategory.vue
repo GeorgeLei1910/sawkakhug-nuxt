@@ -1,0 +1,11 @@
+<script setup>
+   defineProps(['superCategory'])
+</script>
+
+<template>
+  <button class="select" type="submit">
+    <h3>{{ superCategory.title }}</h3>
+    <h6>{{ superCategory.desc }}</h6>
+    <h6></h6>
+  </button>
+</template>

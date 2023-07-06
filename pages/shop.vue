@@ -5,6 +5,7 @@
 <script setup>
     import { ref } from 'vue'
     import categoryCard from '../components/category-card.vue';
+    import superCategory from '../components/supercategory.vue';
 
     const categories = ref([
     
@@ -61,6 +62,8 @@
 </script>
 
 <template>
-    <Cart />
-    <categoryCard v-for="category in categories" :category="category"></categoryCard>
+    <Cart/>
+    <superCategory v-for="superCategory in allCat" :superCategory="superCategory">
+        <categoryCard v-for="category in categories" :category="category"></categoryCard>
+    </superCategory>
 </template>

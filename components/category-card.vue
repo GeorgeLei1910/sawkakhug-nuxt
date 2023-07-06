@@ -3,11 +3,11 @@
 </script>
 
 <style scoped>
-   @import url("../assets/css/category-card.component.css");
+   @import url("../assets/css/category.component.css");
 </style>
 
 <template>
-  <NuxtLink :to="shop/category.id">
+  <NuxtLink :to= shop/category.id>
     <div class="subcategory" :style="{backgroundColor: '#' + category.color}">
       <div class="imgbox"><img :src="category.picture" /></div>
       <div class="textbox">
