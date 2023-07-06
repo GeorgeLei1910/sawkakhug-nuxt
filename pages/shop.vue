@@ -63,7 +63,7 @@
 
 <template>
     <Cart/>
-    <superCategory v-for="superCategory in allCat" :superCategory="superCategory">
-        <categoryCard v-for="category in categories" :category="category"></categoryCard>
-    </superCategory>
+    <div id="shop-layout">
+    <categoryCard v-for="category in categories" :category="category"></categoryCard>
+    </div>
 </template>

@@ -17,6 +17,16 @@
     margin: 5px;
 }
 
+#shop-layout{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+#shop-layout a{
+    flex: 1;
+}
+
 .container #info-bar {
     width: 100%;
     background-color: #c5c5c5;
