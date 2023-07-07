@@ -11,9 +11,9 @@
     <a href="https://ismc.ca/staff/izumi-araki#iFrameResizer0"><button class="button">Click here to Support Izumi</button></a>
     </div>
     <div class="home right">
-      <img class="fiddy" src="../../assets/images/IzumiProfile1.jpg"/>
-      <img class="fiddy" src="../../assets/images/IzumiProfile4.jpg"/>
-      <img class="hundo" src="../../assets/images/IzumiProfile2.jpg" alt=""/>
+      <img class="fiddy" src="assets/images/IzumiProfile1.jpg"/>
+      <img class="fiddy" src="assets/images/IzumiProfile4.jpg"/>
+      <img class="hundo" src="assets/images/IzumiProfile2.jpg" alt=""/>
     </div>
   </section>
 </template>
