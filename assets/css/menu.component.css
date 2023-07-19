@@ -1,9 +1,9 @@
 #menu {
 	width: 100%;
 	background-color: #B3B3B3;
-  display: flex;
-  justify-content: space-evenly;
-  align-content: stretch;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 #menu .menu_options{
