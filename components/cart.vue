@@ -31,6 +31,7 @@
 <template>
     <div id="info-bar">
         <button class="add-cart">Checkout</button>
-        <button class="add-cart" name="view-cart" value="1">View Shopping Cart</button>
+        <button v-if="$route.name === 'shop'" class="add-cart" name="view-cart" value="1">View Shopping Cart</button>
+        <button v-else class="add-cart" name="view-cart" value="1"></button>
     </div>
 </template>

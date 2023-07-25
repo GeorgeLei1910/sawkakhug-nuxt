@@ -1,6 +1,6 @@
 <script setup>
-    defineProps('title', 'desc', 'subcategories');
-   import categoryCard from '../components/category-card.vue';
+  defineProps('title', 'desc', 'subcategories');
+  import categoryCard from '../components/category-card.vue';
 </script>
 
 <template>
