@@ -1,10 +1,10 @@
 <style>
-@import url("../assets/css/newShopStyle.css");
+@import url("../../assets/css/newShopStyle.css");
 </style>
 
 <script setup>
   import { ref } from 'vue'
-  import superCategory from '../components/supercategory.vue';
+  import superCategory from '../../components/supercategory.vue';
 
   const categories = ref([
     {

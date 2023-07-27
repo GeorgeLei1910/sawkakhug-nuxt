@@ -7,6 +7,7 @@
 </style>
 
 <template>
+  <NuxtLink :to="`/shop/${category.id}`">
     <div class="subcategory" :style="{backgroundColor: '#' + category.color}">
       <div class="imgbox"><img :src= "`images/Products/${category.picture}`" /></div>
       <div class="textbox">
@@ -14,4 +15,5 @@
         <p>{{ category.desc }}</p>
       </div>
     </div>
+  </NuxtLink>
 </template>

@@ -1,28 +1,34 @@
 <script setup lang="ts">
-    import { SearchCatalogItemsRequest, ApiError, Client, CatalogObject} from 'square';
-    import ProductCard from "../../components/product-card.vue";
+import {
+  SearchCatalogItemsRequest,
+  Client,
+  Environment,
+} from "square";
+import ProductCard from "../../components/product-card.vue";
 
-    const route = useRoute();
-    const body : SearchCatalogItemsRequest = {
-        categoryIds: [`${route.params.categoryid}`]
-    };
+const route = useRoute();
+const props = defineProps(["categoryName"]);
+const body: SearchCatalogItemsRequest = {
+  categoryIds: [`${route.params.categoryid}`],
+};
 
-    const api : Client = new Client();
-    var items : CatalogObject [] = [];
+const api: Client = new Client({
+  accessToken: process.env.SQUARE_ACCESS_TOKEN,
+  environment: Environment.Production,
+});
 
-    try {
-    const { result, ...httpResponse } = await api.catalogApi.searchCatalogItems(body);
-        items = result.items;
-    } catch (error) {
-    if (error instanceof ApiError) {
-        const errors = error.result;
-        // const { statusCode, headers } = error;
-    }
-    }
+const { result, ...httpResponse } = await api.catalogApi.searchCatalogItems(body)
+
 </script>
 
 <template>
-<div id="shop-layout">
-    <ProductCard v-for="item in items"></ProductCard>
+  <div id="shop-layout" v-if="httpResponse.statusCode == 200" v-for="item in result.items">
+    <ProductCard
+      :catalogObject="item"
+      :title="props.categoryName"
+    ></ProductCard>
+  </div>
+  <div v-else>
+
   </div>
 </template>
