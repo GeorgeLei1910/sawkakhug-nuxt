@@ -1,19 +1,28 @@
 <script setup lang="ts">
 
+import { Category, Item } from "util/types/ShopUtil";
 import ProductCard from "../../components/product-card.vue";
+import superjson from 'superjson';
+import router from "nuxt/dist/pages/runtime/plugins/router";
 
+const props = defineProps<{category: Category}>();
+console.log(props.category)
 const route = useRoute();
-const props = defineProps(["categoryId"]);
-
-console.log(await useFetch(`/api/category/${props.categoryId}`));
+const categoryId = route.params.categoryid;
+const { data } = await useFetch(`/api/category/${categoryId}`, {
+    transform: (value) => {
+      return superjson.parse(value as unknown as string)
+    }
+  });
 
 </script>
 
 <template>
-  <!-- <div id="shop-layout" v-for="item in result.items">
+  <Cart />
+  <div id="shop-layout" v-if="data != null" v-for="item in data">
     <ProductCard
-      :catalogObject="item"
-      :title="props.categoryName"
+      :category = props.category
+      :item = item
     ></ProductCard>
-  </div> -->
+  </div>
   </template>

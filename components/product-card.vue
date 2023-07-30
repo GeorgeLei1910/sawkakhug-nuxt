@@ -1,13 +1,13 @@
 <script setup lang="ts">
-    import { CatalogObject } from 'square';
-    const props = defineProps<{catalogObject: CatalogObject; title: string}>();
+    import { Category, Item } from 'util/types/ShopUtil';
+    const props = defineProps<{category: Category, item: Item}>();
 </script>
 
 <template>
-  <div class="product" style="background-color: #777777">
-    <h6 class="title">{{title}}</h6>
-    <h4 class="prodname">{{props.catalogObject.itemData?.name}}</h4>
-    <p class="description">{{props.catalogObject.itemData?.description}}</p>
+  <div class="product" :style="{backgroundColor: '#666666'}">
+    <h6 class="title"></h6>
+    <h4 class="prodname">{{props.item.name}}</h4>
+    <p class="description">{{props.item.description}}</p>
     <h5 class="price">CAD</h5>
     <p class="size"></p>
     <button onclick="addToCart(props.id)" id="submit" class="add-cart">
