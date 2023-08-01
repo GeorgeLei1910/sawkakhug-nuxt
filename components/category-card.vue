@@ -8,7 +8,7 @@ import { Category } from 'util/types/ShopUtil';
 </style>
 
 <template>
-  <NuxtLink :to="`/shop/${props.category.id}`" :category = props.category>
+  <NuxtLink :to="`/shop/${props.category.id}`">
     <div class="subcategory" :style="{backgroundColor: '#' + props.category.color}">
       <div class="imgbox"><img :src= "`images/Products/${props.category.imagePath}`" /></div>
       <div class="textbox">

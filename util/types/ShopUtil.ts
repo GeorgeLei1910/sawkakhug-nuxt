@@ -27,7 +27,8 @@ export interface Item{
 export interface ItemVariation{
     variationId: string,
     variationName: string,
-    price: Money,
+    price: number,
+    currency: string
 }
 
 export class ItemPhoto{
@@ -66,7 +67,8 @@ export class ShopUtil{
         let output : ItemVariation = {
             variationId: variation.itemId,
             variationName: variation.name,
-            price: variation.priceMoney
+            price: Number(variation.priceMoney.amount) / 100.00,
+            currency: variation.priceMoney.currency
         };
         return output;
     }

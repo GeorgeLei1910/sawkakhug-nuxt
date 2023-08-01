@@ -65,13 +65,16 @@ const base = [
 
 export class CategoryFinder {
   public static find (id : string) : Category | null{
+    let res: Category | null = null;
+    console.log("Find ID: " + id)
     base.forEach((supcat) => {
       supcat.subcategories.forEach(subcat => {
-        if (subcat.id === id)
-          return ShopUtil.makeCategory(subcat);
+        console.log((subcat.id == id))
+        if (subcat.id == id)
+          res = ShopUtil.makeCategory(subcat);
       });
     });
-    return null;
+    return res;
   }
 }
 

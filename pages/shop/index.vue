@@ -1,4 +1,4 @@
-<style>
+<style >
 @import url("../../assets/css/newShopStyle.css");
 </style>
 
