@@ -20,8 +20,8 @@ const {data} = await useFetch<Category>(`/api/category/${categoryId}`, {
 
 <template>
   <Cart />
-  <div id="shop-layout" v-if="data != null" v-for="item in data.items">
-    <ProductCard
+  <div id="shop-layout" v-if="data != null">
+    <ProductCard v-for="item in data.items"
       :category = data
       :item = item
     ></ProductCard>

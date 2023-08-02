@@ -1,6 +1,12 @@
 <style scoped>
   @import url("../node_modules/swiper/swiper.css");
   @import url("../node_modules/swiper/modules/navigation.css");
+  .swiper img{
+    width: 100%;
+  }
+  .swiper {
+    z-index: 0;
+  }
 </style>
 
 <script setup lang="ts">

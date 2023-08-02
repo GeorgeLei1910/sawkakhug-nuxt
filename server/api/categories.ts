@@ -69,7 +69,6 @@ export class CategoryFinder {
     console.log("Find ID: " + id)
     base.forEach((supcat) => {
       supcat.subcategories.forEach(subcat => {
-        console.log((subcat.id == id))
         if (subcat.id == id)
           res = ShopUtil.makeCategory(subcat);
       });

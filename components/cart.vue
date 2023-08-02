@@ -30,8 +30,7 @@
 </style>
 <template>
     <div id="info-bar">
-        <button class="add-cart">Checkout</button>
-        <button v-if="$route.name === 'shop'" class="add-cart" name="view-cart" value="1">View Shopping Cart</button>
-        <button v-else class="add-cart" name="view-cart" value="1"></button>
+        <button class="add-cart">View Shopping Cart</button>
+        <NuxtLink v-if="$route.name !== 'shop'" to="/shop"><button v class="add-cart" name="view-cart" value="1">Back</button></NuxtLink>
     </div>
 </template>
