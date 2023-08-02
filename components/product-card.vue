@@ -35,7 +35,7 @@ async function addToCart(itemId: any) {
     method: "post",
     body: {
       itemId: itemId,
-      cartId: useCookie("cart"),
+      cartId: useCookie("cart")
     },
   });
 }
