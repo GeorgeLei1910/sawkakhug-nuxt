@@ -31,16 +31,19 @@ export interface ItemVariation{
     currency: string
 }
 
-export class ItemPhoto{
-    id : string; 
-    url : string;
-    constructor(id : string, url: string){
-        this.id = id;
-        this.url = url;
-    }
+export interface ItemPhoto{
+    id : string,
+    url? : string
 }
 
 export class ShopUtil{
+    static makeItemPhoto(id: string, url: string): ItemPhoto {
+      let output : ItemPhoto = {
+          id: id,
+          url: url
+      }
+      return output;
+    }
     public static makeCategory(cat : any) : Category {
         let output : Category = {
             id: cat.id,

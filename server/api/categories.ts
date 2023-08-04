@@ -64,7 +64,8 @@ const base = [
 
 
 export class CategoryFinder {
-  public static find (id : string) : Category | null{
+  public static find (id : string | null | undefined) : Category | null{
+    if (id === null || id === undefined) return null;
     let res: Category | null = null;
     console.log("Find ID: " + id)
     base.forEach((supcat) => {

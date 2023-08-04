@@ -4,6 +4,7 @@ import {
   UpdateOrderRequest,
 } from "square";
 import { AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
+import SuperJSON from "superjson";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -11,7 +12,8 @@ export default defineEventHandler(async (event) => {
 
   if (body.cartId === null) {
     return await createNewPaylink(body.itemId)
-                    .then((v) => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]));
+                    .then(v => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]))
+                    .then(v => SuperJSON.stringify(v) as unknown as typeof v);
   }
   
 
@@ -23,21 +25,28 @@ export default defineEventHandler(async (event) => {
     return null;
   }
   
-  let updateOrder : UpdateOrderRequest = {
-    order: {
-        locationId : "",
-        lineItems: [{
-            quantity: "1",
-            catalogObjectId: body.itemId,
-            itemType:'ITEM'
-        }],
-        version: currOrder?.version
+
+  let updateResponse = await SawkakhugSquareAPI.getInstance().ordersApi.updateOrder(currOrder!.id!, {
+    order : {
+      locationId : SawkakhugSquareAPI.LOCATION_ID,
+      lineItems: [{
+          quantity: "1",
+          catalogObjectId: body.itemId,
+          itemType:'ITEM'
+      }],
+      version: currOrder?.version
+  }});
+
+  if (updateResponse.statusCode == 200){
+     let resp = ApiUtils.makeAddToCartResponse(null, updateResponse.result.order!)
+     return SuperJSON.stringify(resp) as unknown as typeof resp;
+  }else{
+    let resp : AddToCartResponse = {
+      respCode: 404,
+      error: ["I don't understand"]
     }
+    return SuperJSON.stringify(resp) as unknown as typeof resp;
   }
-
-  let updateResponse = SawkakhugSquareAPI.getInstance().ordersApi.updateOrder(currOrder!.id!, updateOrder);
-
-  return { body };
 });
 
 async function createNewPaylink(itemId: string) {

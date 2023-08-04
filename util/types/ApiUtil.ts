@@ -1,11 +1,32 @@
 import { Client, Environment, Order, PaymentLink } from "square";
 
-export interface AddToCartRequest{
+export interface EditCartRequest{
     itemId: string,
-    cartId: string
+    orderId: string
 }
 
 export interface AddToCartResponse{
+    respCode: number,
+    error? : string []
+    res? : {
+        paymentLink?: string,
+        url?: string,
+        order: Order
+    }
+}
+
+export interface RemoveFromCartResponse{
+    httpCode: number,
+    error? : string []
+    res? : {
+        paymentLink: string,
+        url: string,
+        order: Order
+    }
+}
+
+export interface ListCartResponse{
+    httpCode: number,
     error? : string []
     res? : {
         paymentLink: string,
@@ -15,21 +36,22 @@ export interface AddToCartResponse{
 }
 
 export class ApiUtils {
-    public static makeAddToCart(itemId: string, cartId: string) : AddToCartRequest{
-        let request : AddToCartRequest = {
+    public static makeEditCart(itemId: string, cartId: string) : EditCartRequest{
+        let request : EditCartRequest = {
             itemId: itemId,
-            cartId: cartId
+            orderId: cartId
         }
         return request;
     }
 
-    public static makeAddToCartResponse(paylink : PaymentLink, order : Order) : AddToCartResponse{
+    public static makeAddToCartResponse(paylink : PaymentLink | null, order : Order) : AddToCartResponse{
         let request : AddToCartResponse = {
-            res : {
-                paymentLink: paylink.id!,
-                url: paylink.url!,
+            res: {
+                paymentLink: paylink?.id,
+                url: paylink?.url,
                 order: order
-            }
+            },
+            respCode: 0
         }
         return request;
     }
@@ -37,6 +59,9 @@ export class ApiUtils {
 
 export class SawkakhugSquareAPI {
     private static api : Client;
+
+    public static LOCATION_ID : string = "";
+
     public static getInstance() : Client {
         if (SawkakhugSquareAPI.api === null){
             SawkakhugSquareAPI.api = new Client({
@@ -47,3 +72,4 @@ export class SawkakhugSquareAPI {
         return SawkakhugSquareAPI.api
     }
 }
+export default SawkakhugSquareAPI

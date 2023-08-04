@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
         item.images = photoMap
           .get(item.id)
           ?.map(
-            (imgId) => new ItemPhoto(imgId, photoUrlMap.get(imgId) as string)
+            (imgId) => ShopUtil.makeItemPhoto(imgId, photoUrlMap.get(imgId) as string)
           );
       });
     }
