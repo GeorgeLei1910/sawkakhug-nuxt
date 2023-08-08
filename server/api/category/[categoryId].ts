@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
         });
         if (variations.length < 1) return;
         var shopItem: Item = ShopUtil.makeItem(item);
-        shopItem.variations = variations.map(v => ShopUtil.makeVariation(v.itemVariationData));
+        shopItem.variations = variations.map(v => ShopUtil.makeVariation(v));
         var imgIds : string[] | null | undefined = item.itemData?.imageIds;
         if (imgIds !== null && imgIds !== undefined) {
           photoMap.set(item.id, imgIds);

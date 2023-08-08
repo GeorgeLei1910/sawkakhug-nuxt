@@ -68,10 +68,10 @@ export class ShopUtil{
 
     public static makeVariation(variation : any) : ItemVariation{
         let output : ItemVariation = {
-            variationId: variation.itemId,
-            variationName: variation.name,
-            price: Number(variation.priceMoney.amount) / 100.00,
-            currency: variation.priceMoney.currency
+            variationId: variation.id,
+            variationName: variation.itemVariationData.name,
+            price: Number(variation.itemVariationData.priceMoney.amount) / 100.00,
+            currency: variation.itemVariationData.priceMoney.currency
         };
         return output;
     }

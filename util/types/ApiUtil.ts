@@ -53,6 +53,7 @@ export class ApiUtils {
             },
             respCode: 0
         }
+        console.log(request);
         return request;
     }
 }
@@ -60,7 +61,7 @@ export class ApiUtils {
 export class SawkakhugSquareAPI {
     private static api : Client;
 
-    public static LOCATION_ID : string = "";
+    public static LOCATION_ID : string = "L8JKG4FT7AG9V";
 
     public static getInstance() : Client {
         if (SawkakhugSquareAPI.api === null){
