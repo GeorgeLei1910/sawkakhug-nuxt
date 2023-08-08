@@ -16,7 +16,7 @@ const api: Client = new Client({
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  console.log("GOt body")
+  console.log("Got body")
   var res : AddToCartResponse;
 
   if (body.orderId === null || body.orderId === undefined) {
