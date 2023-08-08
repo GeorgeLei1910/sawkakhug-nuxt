@@ -1,7 +1,3 @@
-<style>
-
-</style>
-
 <script setup lang="ts">
 import { SOrderLineItem } from "util/types/CartUtil";
 import { Category, Item } from "util/types/ShopUtil";

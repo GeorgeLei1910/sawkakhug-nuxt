@@ -40,7 +40,7 @@ async function addToCart(itemId: any) {
     method: "post",
     body: {
       itemId: itemId,
-      orderId: currOrderId
+      orderId: currOrderId.value
     },
     transform: (value) => {
       return superjson.parse(value as unknown as string)
