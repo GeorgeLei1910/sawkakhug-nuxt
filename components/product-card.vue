@@ -29,15 +29,19 @@ if (slect != undefined){
 }
 const selected = ref(slect);
 
+const orderId = useCookie("order");
+
+console.log(orderId)
+
 async function addToCart(itemId: any) {
   console.log(itemId)
-  const { data: responseData } = await useFetch("api/item/add-to-cart.ts", {
+  const { data: responseData } = await useFetch("/api/item/add-to-cart", {
     method: "post",
     body: {
       itemId: itemId,
-      cartId: useCookie("cart")
+      cartId: orderId
     },
-  });
+  }).then();
 }
 </script>
 

@@ -1,4 +1,5 @@
 import { Client, Environment, Order, PaymentLink } from "square";
+import { SCart } from "./CartUtil";
 
 export interface EditCartRequest{
     itemId: string,
@@ -16,12 +17,12 @@ export interface AddToCartResponse{
 }
 
 export interface RemoveFromCartResponse{
-    httpCode: number,
-    error? : string []
+    respCode: number,
+    error? : string  []
     res? : {
         paymentLink: string,
         url: string,
-        order: Order
+        order?: Order
     }
 }
 
@@ -31,7 +32,7 @@ export interface ListCartResponse{
     res? : {
         paymentLink: string,
         url: string,
-        order: Order
+        cart: SCart
     }
 }
 
@@ -60,16 +61,5 @@ export class ApiUtils {
 export class SawkakhugSquareAPI {
     private static api : Client;
 
-    public static LOCATION_ID : string = "";
-
-    public static getInstance() : Client {
-        if (SawkakhugSquareAPI.api === null){
-            SawkakhugSquareAPI.api = new Client({
-                accessToken: process.env.SQUARE_ACCESS_TOKEN,
-                environment: Environment.Production,
-            });
-        }
-        return SawkakhugSquareAPI.api
-    }
+    public static LOCATION_ID : string = "L8JKG4FT7AG9V";
 }
-export default SawkakhugSquareAPI

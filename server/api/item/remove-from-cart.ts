@@ -1,10 +1,15 @@
 import {
+  Client,
   CreatePaymentLinkRequest,
+  Environment,
   Order,
   UpdateOrderRequest,
 } from "square";
 import { AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
-
+const client : Client = new Client({
+  accessToken: process.env.SQUARE_ACCESS_TOKEN,
+  environment: Environment.Sandbox
+});
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
@@ -12,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   }
 
-  let currOrder = await SawkakhugSquareAPI.getInstance()
+  let currOrder = await client
                             .ordersApi.retrieveOrder(body.orderId)
                             .then((v) => v.result.order);
   
@@ -21,7 +26,7 @@ export default defineEventHandler(async (event) => {
     version: currOrder?.version
   }
 
-  let updateResponse = SawkakhugSquareAPI.getInstance().ordersApi.updateOrder(currOrder!.id!, {
+  let updateResponse = client.ordersApi.updateOrder(currOrder!.id!, {
     order: order,
     fieldsToClear: [body.uri]
   });
