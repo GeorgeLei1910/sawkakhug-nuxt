@@ -26,7 +26,7 @@ export class CartUtil{
             uid: cat.uid,
             name: cat.name,
             totalMoney: Number(cat.totalMoney.amount) / 100.00,
-            variationName: cat.variationName
+            variationName: cat.variationName,
         }
         return output;
     }

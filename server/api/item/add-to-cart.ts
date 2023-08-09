@@ -19,15 +19,14 @@ export default defineEventHandler(async (event) => {
   console.log("Got body")
   var res : AddToCartResponse;
 
-  if (body.orderId === null || body.orderId === undefined) {
+  if (!body.orderId) {
     return await createNewPaylink(body.itemId)
                     .then(v => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]))
                     .then(v => SuperJSON.stringify(v) as unknown as typeof v);
   }
   
 
-  let currOrder = await api
-                            .ordersApi.retrieveOrder(body.orderId)
+  let currOrder = await api.ordersApi.retrieveOrder(body.orderId)
                             .then((v) => v.result.order);
 
   if (checkDuplicates(currOrder!, body.itemId)){

@@ -76,7 +76,12 @@ export default defineEventHandler(async (event) => {
 
     if (photos.statusCode === 200) {
         photos.result.objects?.forEach((pic) => photoUrlMap.set(pic.id, pic.imageData?.url as string));
-        lineItems.forEach((item) => item.photo = mapVariationToPhoto.get(item.varId));
+        lineItems.forEach((item) => {
+            let photoId = mapVariationToPhoto.get(item.varId);
+            if (photoId){
+                item.photo = photoUrlMap.get(photoId);
+            }
+        });
     }
 
     let removed = await api.ordersApi.updateOrder(currOrder!.id!, {

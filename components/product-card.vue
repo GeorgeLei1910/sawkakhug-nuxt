@@ -56,8 +56,8 @@ async function addToCart(itemId: any) {
     var result = v.data.value?.res
     if (result === undefined || result === null) return null;
     currOrderId.value = result.order?.id;
-    paylink.value = result?.paymentLink;
-    url.value = result?.url;
+    if (!paylink.value) paylink.value = result?.paymentLink;
+    if (!url.value) url.value = result?.url;
     return v;
   });
 }
