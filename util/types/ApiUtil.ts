@@ -54,6 +54,7 @@ export class ApiUtils {
             },
             respCode: 0
         }
+        console.log(request);
         return request;
     }
 }

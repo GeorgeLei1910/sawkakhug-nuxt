@@ -16,7 +16,9 @@ select {
 </style>
 
 <script setup lang="ts">
+import superjson from "superjson";
 import { Category, Item } from "util/types/ShopUtil";
+import {AddToCartResponse} from "util/types/ApiUtil"
 const props = defineProps<{ category: Category; item: Item }>();
 
 const options = ref(props.item.variations);
@@ -28,6 +30,9 @@ if (slect != undefined){
   slect = "";
 }
 const selected = ref(slect);
+let currOrderId = useCookie("order");
+let paylink = useCookie("paylink");
+let url = useCookie("url");
 
 const orderId = useCookie("order");
 
@@ -35,13 +40,26 @@ console.log(orderId)
 
 async function addToCart(itemId: any) {
   console.log(itemId)
-  const { data: responseData } = await useFetch("/api/item/add-to-cart", {
+  await useFetch<AddToCartResponse>("/api/item/add-to-cart", {
     method: "post",
     body: {
       itemId: itemId,
-      cartId: orderId
+      orderId: currOrderId.value
     },
-  }).then();
+    transform: (value) => {
+      return superjson.parse(value as unknown as string)
+    }
+  })
+  .then((v) => {
+    console.log(v);
+    if (v === undefined) return;
+    var result = v.data.value?.res
+    if (result === undefined || result === null) return null;
+    currOrderId.value = result.order?.id;
+    paylink.value = result?.paymentLink;
+    url.value = result?.url;
+    return v;
+  });
 }
 </script>
 

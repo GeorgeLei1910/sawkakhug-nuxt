@@ -1,7 +1,3 @@
-<style>
-
-</style>
-
 <script setup lang="ts">
 import { SOrderLineItem } from "util/types/CartUtil";
 import { Category, Item } from "util/types/ShopUtil";
@@ -9,7 +5,7 @@ const props = defineProps<{item: SOrderLineItem }>();
 
 async function removeFromCart(itemId: any) {
   console.log(itemId)
-  const { data: responseData } = await useFetch("api/item/remove-from-cart.ts", {
+  const { data: responseData } = await useFetch("api/item/remove-from-cart", {
     method: "post",
     body: {
       itemId: itemId,

@@ -1,23 +1,32 @@
 import {
+  Client,
   CreatePaymentLinkRequest,
+  Environment,
   Order,
   UpdateOrderRequest,
 } from "square";
 import { AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
 import SuperJSON from "superjson";
 
+
+const api: Client = new Client({
+  accessToken: process.env.SQUARE_ACCESS_TOKEN,
+  environment: Environment.Production,
+});
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+  console.log("Got body")
   var res : AddToCartResponse;
 
-  if (body.cartId === null) {
+  if (body.orderId === null || body.orderId === undefined) {
     return await createNewPaylink(body.itemId)
                     .then(v => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]))
                     .then(v => SuperJSON.stringify(v) as unknown as typeof v);
   }
   
 
-  let currOrder = await SawkakhugSquareAPI.getInstance()
+  let currOrder = await api
                             .ordersApi.retrieveOrder(body.orderId)
                             .then((v) => v.result.order);
 
@@ -26,7 +35,7 @@ export default defineEventHandler(async (event) => {
   }
   
 
-  let updateResponse = await SawkakhugSquareAPI.getInstance().ordersApi.updateOrder(currOrder!.id!, {
+  let updateResponse = await api.ordersApi.updateOrder(currOrder!.id!, {
     order : {
       locationId : SawkakhugSquareAPI.LOCATION_ID,
       lineItems: [{
@@ -52,7 +61,7 @@ export default defineEventHandler(async (event) => {
 async function createNewPaylink(itemId: string) {
   let paylinkRequest: CreatePaymentLinkRequest = {
     order: {
-      locationId: "",
+      locationId: SawkakhugSquareAPI.LOCATION_ID,
       lineItems: [
         {
           quantity: "1",
@@ -70,8 +79,9 @@ async function createNewPaylink(itemId: string) {
       },
     },
   };
+  console.log(paylinkRequest)
   let paymentLink =
-    await SawkakhugSquareAPI.getInstance().checkoutApi.createPaymentLink(
+    await api.checkoutApi.createPaymentLink(
       paylinkRequest
     );
   return paymentLink;

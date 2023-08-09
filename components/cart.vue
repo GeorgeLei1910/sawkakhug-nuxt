@@ -28,9 +28,16 @@
             margin: 20px 10px;
         }
 </style>
+<script setup lang="ts">
+    const paylink = useCookie("url");
+    const url = paylink.value || "";
+    const route = useRoute();
+    console.log(route)
+</script>
 <template>
     <div id="info-bar">
-        <button class="add-cart">View Shopping Cart</button>
-        <NuxtLink v-if="$route.name !== 'shop'" to="/shop"><button v class="add-cart" name="view-cart" value="1">Back</button></NuxtLink>
+        <NuxtLink v-if="$route.path !== '/shop/cart'" to="/shop/cart"><button class="add-cart">View Shopping Cart</button></NuxtLink>
+        <a v-if="$route.path == '/shop/cart'" :href="url" target="_blank"><button class="add-cart">Checkout</button></a>
+        <NuxtLink v-if="$route.path !== '/shop'" to="/shop"><button v class="add-cart" name="view-cart" value="1">Back</button></NuxtLink>
     </div>
 </template>

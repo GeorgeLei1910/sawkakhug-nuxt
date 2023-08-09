@@ -1,35 +1,40 @@
-import { CatalogItem, CatalogObject, UpdateOrderRequest } from "square";
+import { CatalogItem, CatalogObject, Client, Environment, UpdateOrderRequest } from "square";
 import { SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
 import {CartUtil,  SCart,  SOrderLineItem } from "../../../util/types/CartUtil";
 import { CategoryFinder } from "../categories";
 import ShopUtil, { ItemPhoto } from "../../../util/types/ShopUtil";
 import SuperJSON from "superjson";
 
+
+const api: Client = new Client({
+    accessToken: process.env.SQUARE_ACCESS_TOKEN,
+    environment: Environment.Production,
+  });
+  
+
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-  
-    if (body.orderId == null){
-        
+    console.log(body.orderId)
+    if (body.orderId === null || body.orderId === undefined){
+        console.log("No Order Id")
+        return emptyCart();
     }
-  
-    let currOrder = await SawkakhugSquareAPI.getInstance()
-                              .ordersApi.retrieveOrder(body.orderId)
+
+    let currOrder = await api.ordersApi.retrieveOrder(body.orderId)
                               .then((v) => v.result.order);
-    
+    console.log("Got Current Order")
     if (currOrder == null || currOrder.lineItems == undefined || currOrder.lineItems.length < 1){
-        // return 
+        console.log("Looks like there isnt anything")
+        return emptyCart();
     }
 
     let lineItems : SOrderLineItem [] = currOrder!.lineItems!.map(v => CartUtil.createOrderLineItem(v));
-
-    if (lineItems === undefined) return;
-
-    let varItems = await SawkakhugSquareAPI.getInstance()
-                                .catalogApi.batchRetrieveCatalogObjects({
+    if (lineItems === undefined) return emptyCart();
+    let varItems = await api.catalogApi.batchRetrieveCatalogObjects({
                                     objectIds: lineItems.map(v => v.varId)
                                 });
     
-    if (varItems.statusCode != 200) return;
+    if (varItems.statusCode != 200) return emptyCart();
     var soldOutVarIds : string [] = [], forSaleVarIds : string [] = [], itemIds : string [] = [];
     varItems.result.objects?.forEach((v) =>{
         var override = v.itemVariationData?.locationOverrides;
@@ -42,7 +47,7 @@ export default defineEventHandler(async (event) => {
         itemIds.push(v.itemVariationData?.itemId!);
     })
 
-    let items = await SawkakhugSquareAPI.getInstance().catalogApi.batchRetrieveCatalogObjects({
+    let items = await api.catalogApi.batchRetrieveCatalogObjects({
         objectIds: itemIds
     })
 
@@ -65,7 +70,7 @@ export default defineEventHandler(async (event) => {
         mapVariationToPhoto.set(v.varId, mapVariationToItem.get(v.varId)!.itemData!.imageIds![0]);
     })
 
-    let photos = await SawkakhugSquareAPI.getInstance().catalogApi.batchRetrieveCatalogObjects({
+    let photos = await api.catalogApi.batchRetrieveCatalogObjects({
         objectIds: [...mapVariationToPhoto.values()]
     });
 
@@ -74,7 +79,7 @@ export default defineEventHandler(async (event) => {
         lineItems.forEach((item) => item.photo = mapVariationToPhoto.get(item.varId));
     }
 
-    let removed = await SawkakhugSquareAPI.getInstance().ordersApi.updateOrder(currOrder!.id!, {
+    let removed = await api.ordersApi.updateOrder(currOrder!.id!, {
         order: currOrder,
         fieldsToClear: soldOutVarIds
     });
@@ -89,4 +94,15 @@ export default defineEventHandler(async (event) => {
     
     return SuperJSON.stringify(output) as unknown as typeof output;
   });
+
+  function emptyCart(){
+    let output : SCart = {
+        id: "",
+        locationId: "",
+        totalPrice: 0,
+        items: [],
+        soldOut: []
+    }
+    return SuperJSON.stringify(output) as unknown as typeof output;
+  }
   
