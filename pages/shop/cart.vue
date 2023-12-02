@@ -2,7 +2,9 @@
 import SuperJSON from 'superjson';
 import { SCart } from 'util/types/CartUtil';
 
-let oId = useCookie("order");
+let oId = useCookie("order", {
+  maxAge: 3600 * 24 * 7
+});
 
 console.log('oId');
 console.log(oId);
@@ -22,8 +24,9 @@ const {data} = await useFetch<SCart>("/api/item/list-cart", {
 </script>
 
 <template>
-    <Cart/>
+    <Cart :total="data?.totalPrice"/>
     <div id="shop-layout">
-        <CartItem v-for="item in data?.items" :item="item"></CartItem>
+        <h2 v-if="!data?.items || data?.items.length < 1"> Cart empty, go add some stuff!! </h2>
+        <CartItem v-else v-for="item in data?.items" :item="item"></CartItem>
     </div>
 </template>

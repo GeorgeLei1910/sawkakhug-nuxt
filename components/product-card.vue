@@ -13,6 +13,13 @@ select {
     border-radius: 18px;
 }
 
+.added {
+  color: white;
+  background-color: #398f47;
+}
+
+
+
 </style>
 
 <script setup lang="ts">
@@ -22,6 +29,9 @@ import {AddToCartResponse} from "util/types/ApiUtil"
 const props = defineProps<{ category: Category; item: Item }>();
 
 const options = ref(props.item.variations);
+const buttonText = ref("Add To Cart");
+const buttonColor = ref("#F9BA00");
+
 
 var slect : any = props.item.variations;
 if (slect != undefined){
@@ -30,13 +40,20 @@ if (slect != undefined){
   slect = "";
 }
 const selected = ref(slect);
-let currOrderId = useCookie("order");
-let paylink = useCookie("paylink");
-let url = useCookie("url");
+let currOrderId = useCookie("order", {
+  maxAge: 3600 * 24 * 3
+});
+let paylink = useCookie("paylink", {
+  maxAge: 3600 * 24 * 3
+});
+let url = useCookie("url", {
+  maxAge: 3600 * 24 * 3
+});
 
-const orderId = useCookie("order");
+function changeText(text : string, textToChangeBackTo : string) {
+      var buttonId = document.getElementById("submit") as HTMLButtonElement;
 
-console.log(orderId)
+    }
 
 async function addToCart(itemId: any) {
   console.log(itemId)
@@ -53,11 +70,18 @@ async function addToCart(itemId: any) {
   .then((v) => {
     console.log(v);
     if (v === undefined) return;
+    if (v.data.value?.respCode == 200){
     var result = v.data.value?.res
     if (result === undefined || result === null) return null;
     currOrderId.value = result.order?.id;
     if (!paylink.value) paylink.value = result?.paymentLink;
     if (!url.value) url.value = result?.url;
+      buttonText.value = "Added To Cart";
+      buttonColor.value = "#398f47";
+      
+      setTimeout(function() { buttonText.value = "Add To Cart"; }, 3000);
+      setTimeout(function() { buttonColor.value = "#F9BA00"; }, 3000);
+    }
     return v;
   });
 }
@@ -79,8 +103,9 @@ async function addToCart(itemId: any) {
       </tbody>
     </table>
     <p class="size"></p>
-    <button @click="addToCart(selected)" id="submit" class="add-cart">
-      Add to Cart
+    <button  @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor }" >
+      {{ buttonText }}
     </button>
   </div>
+  
 </template>

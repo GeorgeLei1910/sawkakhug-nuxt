@@ -52,7 +52,7 @@ export class ApiUtils {
                 url: paylink?.url,
                 order: order
             },
-            respCode: 0
+            respCode: 200
         }
         console.log(request);
         return request;

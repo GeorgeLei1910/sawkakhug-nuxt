@@ -30,7 +30,11 @@ export default defineEventHandler(async (event) => {
                             .then((v) => v.result.order);
 
   if (checkDuplicates(currOrder!, body.itemId)){
-    return null;
+    let resp : AddToCartResponse = {
+      respCode: 400,
+      error: ["Looks like one is already in your cart!"]
+    }
+    return SuperJSON.stringify(resp) as unknown as typeof resp;
   }
   
 

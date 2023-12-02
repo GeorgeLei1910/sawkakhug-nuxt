@@ -11,14 +11,15 @@ async function removeFromCart(itemId: any) {
     method: "post",
     body: {
       itemId: itemId,
-      orderId: useCookie("order")
+      orderId: useCookie("order", {
+      maxAge: 3600 * 24 * 7
+    })
     },    
     transform: (value) => {
       return SuperJSON.parse(value as unknown as string)
     }
-  }).then(v => {
-    console.log(v.data.value?.respCode);
-  });
+  })
+  refreshNuxtData();
 }
 </script>
 <style scoped>
