@@ -18,7 +18,10 @@ select {
   background-color: #398f47;
 }
 
-
+.add_cart{
+  color: v-bind(buttonTextColor);
+  background-color: v-bind(buttonColor);
+}
 
 </style>
 
@@ -31,6 +34,7 @@ const props = defineProps<{ category: Category; item: Item }>();
 const options = ref(props.item.variations);
 const buttonText = ref("Add To Cart");
 const buttonColor = ref("#F9BA00");
+const buttonTextColor = ref("#694E00");
 
 
 var slect : any = props.item.variations;
@@ -49,11 +53,6 @@ let paylink = useCookie("paylink", {
 let url = useCookie("url", {
   maxAge: 3600 * 24 * 3
 });
-
-function changeText(text : string, textToChangeBackTo : string) {
-      var buttonId = document.getElementById("submit") as HTMLButtonElement;
-
-    }
 
 async function addToCart(itemId: any) {
   console.log(itemId)
@@ -78,9 +77,17 @@ async function addToCart(itemId: any) {
     if (!url.value) url.value = result?.url;
       buttonText.value = "Added To Cart";
       buttonColor.value = "#398f47";
-      
+      buttonTextColor.value = "#FFFFFF";
       setTimeout(function() { buttonText.value = "Add To Cart"; }, 3000);
       setTimeout(function() { buttonColor.value = "#F9BA00"; }, 3000);
+      setTimeout(function() { buttonTextColor.value = "#694E00"; }, 3000);
+    }else{
+      buttonText.value = v.data.value!.error![0];
+      buttonColor.value = "#398f47";
+      buttonTextColor.value = "#FFFFFF";
+      setTimeout(function() { buttonText.value = "Add To Cart"; }, 3000);
+      setTimeout(function() { buttonColor.value = "#F9BA00"; }, 3000);
+      setTimeout(function() { buttonTextColor.value = "#694E00"; }, 3000);
     }
     return v;
   });
@@ -103,7 +110,7 @@ async function addToCart(itemId: any) {
       </tbody>
     </table>
     <p class="size"></p>
-    <button  @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor }" >
+    <button  @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor , color : buttonTextColor }" >
       {{ buttonText }}
     </button>
   </div>

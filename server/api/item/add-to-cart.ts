@@ -22,7 +22,10 @@ export default defineEventHandler(async (event) => {
   if (!body.orderId) {
     return await createNewPaylink(body.itemId)
                     .then(v => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]))
-                    .then(v => SuperJSON.stringify(v) as unknown as typeof v);
+                    .then(v => SuperJSON.stringify(v) as unknown as typeof v)
+                    .catch((exc) => {
+
+                    });
   }
   
 
@@ -32,7 +35,7 @@ export default defineEventHandler(async (event) => {
   if (checkDuplicates(currOrder!, body.itemId)){
     let resp : AddToCartResponse = {
       respCode: 400,
-      error: ["Looks like one is already in your cart!"]
+      error: ["Item Already Added"]
     }
     return SuperJSON.stringify(resp) as unknown as typeof resp;
   }
@@ -55,7 +58,7 @@ export default defineEventHandler(async (event) => {
   }else{
     let resp : AddToCartResponse = {
       respCode: 404,
-      error: ["I don't understand"]
+      error: ["Can't Add Item"]
     }
     return SuperJSON.stringify(resp) as unknown as typeof resp;
   }
