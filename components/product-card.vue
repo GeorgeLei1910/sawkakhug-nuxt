@@ -61,6 +61,7 @@ if (slect != undefined){
   slect = "";
 }
 const selected = ref(slect);
+const timeout = 2000;
 let currOrderId = useCookie("order", {
   maxAge: 3600 * 24 * 3
 });
@@ -95,16 +96,16 @@ async function addToCart(itemId: any) {
       buttonText.value = "Added To Cart";
       buttonColor.value = "#398f47";
       buttonTextColor.value = "#FFFFFF";
-      setTimeout(function() { buttonText.value = "Add To Cart"; }, 3000);
-      setTimeout(function() { buttonColor.value = "#F9BA00"; }, 3000);
-      setTimeout(function() { buttonTextColor.value = "#694E00"; }, 3000);
+      setTimeout(function() { buttonText.value = "Add To Cart"; }, timeout);
+      setTimeout(function() { buttonColor.value = "#F9BA00"; }, timeout);
+      setTimeout(function() { buttonTextColor.value = "#694E00"; }, timeout);
     }else{
       buttonText.value = v.data.value!.error![0];
-      buttonColor.value = "#398f47";
+      buttonColor.value = "#ff6b6b";
       buttonTextColor.value = "#FFFFFF";
-      setTimeout(function() { buttonText.value = "Add To Cart"; }, 3000);
-      setTimeout(function() { buttonColor.value = "#F9BA00"; }, 3000);
-      setTimeout(function() { buttonTextColor.value = "#694E00"; }, 3000);
+      setTimeout(function() { buttonText.value = "Add To Cart"; }, timeout);
+      setTimeout(function() { buttonColor.value = "#F9BA00"; }, timeout);
+      setTimeout(function() { buttonTextColor.value = "#694E00"; }, timeout);
     }
     return v;
   });
