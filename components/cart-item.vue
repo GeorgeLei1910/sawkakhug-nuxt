@@ -23,8 +23,50 @@ async function removeFromCart(itemId: any) {
 }
 </script>
 <style scoped>
+
+.cart-items{
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      width: 100%;
+      border-radius: 20px;
+      margin: 10px 0;
+      min-width: 200px;
+  }
+
+  .cart-items .left{
+      padding: 20px;
+      width: fit-content;
+  }
+
+  .cart-items .left img{
+      width: 200px;
+      border-radius: 20px;
+  }
+
+  .cart-items .right{
+      color: white;
+      width: 200px;
+  }
+
+  .cart-items .right *{
+      margin: 20px 10px;
+  }
+
   #submit {
+    background-color: #F9BA00;
+    color: #694E00;
+    min-width: 150px;
     height: 50px;
+    padding: 5px 10px;
+    margin: 0 10px;
+    border-radius: 75px;
+    font-weight: normal;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    border-style: none;
+    transition: all 0.1s linear;
   }
   image{
     display: block;

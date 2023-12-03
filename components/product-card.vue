@@ -13,14 +13,31 @@ select {
     border-radius: 18px;
 }
 
-.added {
-  color: white;
-  background-color: #398f47;
-}
 
-.add_cart{
+.add-cart{
   color: v-bind(buttonTextColor);
   background-color: v-bind(buttonColor);
+  min-width: 150px;
+  height: 100%;
+  padding: 5px 10px;
+  margin: 0 10px;
+  border-radius: 75px;
+  font-weight: normal;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-style: none;
+  transition: all 0.1s linear;
+}
+
+.select{
+    width: 100%;
+	display: inline-block;
+	margin: 10px 2.5px;
+	border: 5px solid rgb(177, 133, 0);
+	border-radius: 10px;
+	background-color: rgb(255, 219, 112);
+	color:  rgb(177, 133, 0);
 }
 
 </style>

@@ -1,7 +1,3 @@
-<style >
-@import url("../../assets/css/newShopStyle.css");
-</style>
-
 <script setup lang="ts">
   import superCategory from '../../components/supercategory.vue';
   import superjson from 'superjson';

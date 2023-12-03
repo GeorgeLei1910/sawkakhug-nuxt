@@ -1,5 +1,21 @@
-<style>
+<style scoped>
   @import url("../../assets/css/product-card.component.css");
+
+  .select h3{
+	font-size: 32px;
+    margin: 5px;
+}
+.select h6{
+	font-size: 18px;
+    margin: 5px;
+}
+
+#shop-layout{
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
 </style>
 
 <script setup lang="ts">

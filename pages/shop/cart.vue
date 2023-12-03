@@ -23,6 +23,12 @@ const {data} = await useFetch<SCart>("/api/item/list-cart", {
   });
 </script>
 
+<style scoped>
+  h2{
+    text-align: center;
+  }
+</style>
+
 <template>
     <Cart :total="data?.totalPrice"/>
     <div id="shop-layout">
