@@ -1,14 +1,13 @@
-<script setup lang="ts">
+<script scoped setup lang="ts">
 import SuperJSON from "superjson";
 import { RemoveFromCartResponse } from "util/types/ApiUtil";
 import { SOrderLineItem } from "util/types/CartUtil";
-import { Category, Item } from "util/types/ShopUtil";
 const props = defineProps<{item: SOrderLineItem }>();
 
 async function removeFromCart(itemId: any) {
   console.log(itemId)
   await useFetch<RemoveFromCartResponse>("/api/item/remove-from-cart", {
-    method: "post",
+    method: "delete",
     body: {
       itemId: itemId,
       orderId: useCookie("order", {
@@ -18,8 +17,9 @@ async function removeFromCart(itemId: any) {
     transform: (value) => {
       return SuperJSON.parse(value as unknown as string)
     }
-  })
-  refreshNuxtData();
+  }).then((res) => console.log("Remove : " + res))
+  .catch((err) => console.log(err))
+  await refreshNuxtData();
 }
 </script>
 <style scoped>

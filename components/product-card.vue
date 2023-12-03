@@ -42,7 +42,7 @@ select {
 
 </style>
 
-<script setup lang="ts">
+<script scoped setup lang="ts">
 import superjson from "superjson";
 import { Category, Item } from "util/types/ShopUtil";
 import {AddToCartResponse} from "util/types/ApiUtil"
@@ -73,9 +73,9 @@ let url = useCookie("url", {
 });
 
 async function addToCart(itemId: any) {
-  console.log(itemId)
+  console.log("Clicked on " + itemId)
   await useFetch<AddToCartResponse>("/api/item/add-to-cart", {
-    method: "post",
+    method: "put",
     body: {
       itemId: itemId,
       orderId: currOrderId.value
@@ -128,7 +128,7 @@ async function addToCart(itemId: any) {
       </tbody>
     </table>
     <p class="size"></p>
-    <button  @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor , color : buttonTextColor }" >
+    <button @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor , color : buttonTextColor }" >
       {{ buttonText }}
     </button>
   </div>
