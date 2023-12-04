@@ -67,7 +67,7 @@
 }
 
 h5{
-    font-size: 20px;
+    font-size: 100%;
     margin: 0;
 }
 

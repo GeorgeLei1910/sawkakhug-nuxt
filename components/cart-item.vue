@@ -33,6 +33,7 @@ async function removeFromCart(itemId: any) {
       flex-wrap: wrap;
       width: 100%;
       border-radius: 20px;
+      padding: 10px 0;
       margin: 10px 0;
       min-width: 200px;
   }
