@@ -4,6 +4,7 @@ import { RemoveFromCartResponse } from "util/types/ApiUtil";
 import { SOrderLineItem } from "util/types/CartUtil";
 const props = defineProps<{item: SOrderLineItem }>();
 
+
 async function removeFromCart(itemId: any) {
   console.log(itemId)
   await useFetch<RemoveFromCartResponse>("/api/item/remove-from-cart", {
@@ -17,9 +18,11 @@ async function removeFromCart(itemId: any) {
     transform: (value) => {
       return SuperJSON.parse(value as unknown as string)
     }
-  }).then((res) => console.log("Remove : " + res))
+  }).then((res) => {
+    console.log("Remove : " + res);
+  })
   .catch((err) => console.log(err))
-  await refreshNuxtData();
+  .finally(() => window.location.reload());
 }
 </script>
 <style scoped>
