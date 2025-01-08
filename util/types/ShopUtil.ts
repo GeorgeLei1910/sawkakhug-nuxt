@@ -3,6 +3,7 @@ import { ApiResponse, CatalogItem, CatalogItemVariation, CatalogObject, Money, S
 export interface SuperCategory{
     name: string,
     description: string,
+    show: boolean,
     subcategories: Category[]
 }
 
