@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SuperJSON from 'superjson';
-import { SCart } from 'util/types/CartUtil';
+import type { SCart } from '~/util/types/CartUtil';
 
 let oId = useCookie("order", {
   maxAge: 3600 * 24 * 7

@@ -1,5 +1,3 @@
-import { ApiResponse, CatalogItem, CatalogItemVariation, CatalogObject, Money, SearchCatalogItemsResponse } from "square";
-
 export interface SuperCategory{
     name: string,
     description: string,
@@ -11,8 +9,8 @@ export interface Category{
     id: string,
     name: string,
     color: string,
-    description: string,
-    imagePath: string,
+    description: string | null,
+    imagePath: string | null,
     items: Item[]
 }
 
@@ -79,20 +77,21 @@ export class ShopUtil{
 
     public static makeSuperCategory(supCat : any) : SuperCategory{
         let output : SuperCategory = {
-              name: supCat.title,
-              description: supCat.desc,
-              subcategories: supCat.subcategories.map((s: { id: any; title: any; color: any; desc: any; picture: any; }) => {
-                var subc : Category = {
-                  id: s.id,
-                  name: s.title,
-                  color: s.color,
-                  description: s.desc,
-                  imagePath: s.picture,
-                  items: []
-                }
+            name: supCat.title,
+            description: supCat.desc,
+            subcategories: supCat.subcategories.map((s: { id: any; title: any; color: any; desc: any; picture: any; }) => {
+                var subc: Category = {
+                    id: s.id,
+                    name: s.title,
+                    color: s.color,
+                    description: s.desc,
+                    imagePath: s.picture,
+                    items: []
+                };
                 return subc;
-              })
-            }
+            }),
+            show: false
+        }
             return output;
     }
 }

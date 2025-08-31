@@ -44,8 +44,8 @@ select {
 
 <script scoped setup lang="ts">
 import superjson from "superjson";
-import { Category, Item } from "util/types/ShopUtil";
-import {AddToCartResponse} from "util/types/ApiUtil"
+import { type Category, type Item } from "~/util/types/ShopUtil";
+import {type AddToCartResponse} from "~/util/types/ApiUtil"
 const props = defineProps<{ category: Category; item: Item }>();
 
 const options = ref(props.item.variations);

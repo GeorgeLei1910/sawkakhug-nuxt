@@ -1,10 +1,7 @@
 import {
   Client,
-  CreatePaymentLinkRequest,
   Environment,
-  Order,
-  UpdateOrderRequest,
-} from "square";
+} from "square/legacy";
 import { AddToCartResponse, ApiUtils, RemoveFromCartResponse, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
 import SuperJSON from "superjson";
 const client : Client = new Client({

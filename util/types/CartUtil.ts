@@ -1,4 +1,4 @@
-import { ApiResponse, CatalogItem, CatalogItemVariation, CatalogObject, Money, Order, OrderLineItem, SearchCatalogItemsResponse } from "square";
+import { type Order } from "square/legacy";
 
 export interface SOrderLineItem{
     varId: string,

@@ -1,4 +1,4 @@
-import { Client, Environment } from "square";
+import { Client, Environment } from "square/legacy";
 import superjson from "superjson";
 
   

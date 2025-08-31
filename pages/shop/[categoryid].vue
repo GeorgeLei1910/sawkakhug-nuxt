@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 
-import { Category } from "util/types/ShopUtil";
+import type { Category } from "~/util/types/ShopUtil";
 import ProductCard from "../../components/product-card.vue";
 import superjson from 'superjson';
 

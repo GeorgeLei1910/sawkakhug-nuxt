@@ -1,10 +1,5 @@
-import {
-  Client,
-  CreatePaymentLinkRequest,
-  Environment,
-  Order,
-  UpdateOrderRequest,
-} from "square";
+
+import { Environment, Client, CreatePaymentLinkRequest, Order } from "square/legacy";
 import { AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
 import SuperJSON from "superjson";
 

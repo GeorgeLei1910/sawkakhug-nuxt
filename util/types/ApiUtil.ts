@@ -1,5 +1,5 @@
-import { Client, Environment, Order, PaymentLink } from "square";
-import { SCart } from "./CartUtil";
+import type { Order, PaymentLink } from "square/legacy";
+import type { SCart } from "./CartUtil";
 
 export interface EditCartRequest{
     itemId: string,
@@ -58,9 +58,6 @@ export class ApiUtils {
         return request;
     }
 }
-
 export class SawkakhugSquareAPI {
-    private static api : Client;
-
     public static LOCATION_ID : string = "L8JKG4FT7AG9V";
 }

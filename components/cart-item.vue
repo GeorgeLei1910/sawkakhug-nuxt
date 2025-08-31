@@ -1,7 +1,8 @@
 <script scoped setup lang="ts">
 import SuperJSON from "superjson";
-import { RemoveFromCartResponse } from "util/types/ApiUtil";
-import { SOrderLineItem } from "util/types/CartUtil";
+import type { RemoveFromCartResponse } from "~/util/types/ApiUtil";
+import type { SOrderLineItem } from "~/util/types/CartUtil";
+
 const props = defineProps<{item: SOrderLineItem }>();
 
 

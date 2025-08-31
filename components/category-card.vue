@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Category } from 'util/types/ShopUtil';
+import type { Category } from '~/util/types/ShopUtil';
     const props = defineProps<{category : Category}>();
 </script>
 
@@ -65,7 +65,7 @@ import { Category } from 'util/types/ShopUtil';
 <template>
   <NuxtLink :to="`/shop/${props.category.id}`">
     <div class="subcategory" :style="{backgroundColor: '#' + props.category.color}">
-      <div class="imgbox"><img :src= "`images/Products/${props.category.imagePath}`" /></div>
+      <div class="imgbox"><img :src= "`${props.category.imagePath}`" /></div>
       <div class="textbox">
         <h3>{{ props.category.name }}</h3>
         <p>{{ props.category.description }}</p>

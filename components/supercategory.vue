@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SuperCategory } from "util/types/ShopUtil";
+import type { SuperCategory } from "~/util/types/ShopUtil";
 import categoryCard from "../components/category-card.vue";
 const props = defineProps<{ sc: SuperCategory }>();
 </script>

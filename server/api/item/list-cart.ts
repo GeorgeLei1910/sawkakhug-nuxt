@@ -1,9 +1,7 @@
-import { CatalogItem, CatalogObject, Client, Environment, UpdateOrderRequest } from "square";
-import { SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
+import { CatalogObject, Client, Environment } from "square/legacy";
 import {CartUtil,  SCart,  SOrderLineItem } from "../../../util/types/CartUtil";
-import { CategoryFinder } from "../categories";
-import ShopUtil, { ItemPhoto } from "../../../util/types/ShopUtil";
 import SuperJSON from "superjson";
+import { CategoryFinder } from "../categories";
 
 
 const api: Client = new Client({

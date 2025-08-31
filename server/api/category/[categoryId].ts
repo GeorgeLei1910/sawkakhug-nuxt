@@ -4,15 +4,10 @@ import {
   Environment,
   BatchRetrieveCatalogObjectsRequest,
   ItemVariationLocationOverrides,
-} from "square";
-import ShopUtil, {
-  Category,
-  Item,
-  ItemPhoto,
-  ItemVariation,
-} from "../../../util/types/ShopUtil";
+} from "square/legacy";
 import superjson from "superjson";
-import find, { CategoryFinder } from "../categories";
+import { CategoryFinder } from "../categories";
+import ShopUtil, { Category, Item } from "~/util/types/ShopUtil";
 
 export default defineEventHandler(async (event) => {
   const categoryId: string | undefined = event.context.params?.categoryId;
