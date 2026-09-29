@@ -1,18 +1,18 @@
-import { Client, Environment } from "square/legacy";
+import { SquareClient, Square, SquareEnvironment } from "square";
 import superjson from "superjson";
 
   
 export default defineEventHandler(async (event) => {    
-    const api: Client = new Client({
-    accessToken: process.env.SQUARE_ACCESS_TOKEN,
-    environment: Environment.Production,
+    const api: SquareClient = new SquareClient({
+    token: process.env.SQUARE_ACCESS_TOKEN,
+    environment: SquareEnvironment.Production,
     });
 
     var imgUrl : string[] = [];
 
-
-    await api.catalogApi.listCatalog(undefined, 'IMAGE').then((res) => {
-    res.result.objects?.forEach((photo) => {
+    await api.catalog.search({ objectTypes: [Square.CatalogObjectType.Image] }).then((res) => {
+    res.objects?.forEach((obj) => {
+        let photo = obj as Square.CatalogObjectImage;
         let url : string = photo.imageData?.url!;
         imgUrl?.push(url);
     })

@@ -16,6 +16,9 @@
             <NuxtLink to="/gallery" title="Her Past Knittings">
                 <div class="menu_options">Gallery</div>
             </NuxtLink>
+            <NuxtLink to="/sackcloth" title="Sackcloth Solo Exhibition">
+                <div class="menu_options">Sackcloth</div>
+            </NuxtLink>
             <a href="mailto:sawkakhugamimono@gmail.com">
                 <div class="menu_options">Contact</div>
             </a>

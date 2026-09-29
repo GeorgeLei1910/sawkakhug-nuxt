@@ -6,5 +6,6 @@
   <Menu></Menu>
   <NuxtPage />
   <Footer></Footer>
+  <BackToTop />
   </div>
 </template>
