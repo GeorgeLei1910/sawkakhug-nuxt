@@ -3,7 +3,7 @@
 </style>
 <template>
   <footer class="secondary_header footer">
-    <div class="copyright">&copy;2023 - <strong>Izumi Araki</strong></div>
+    <div class="copyright">&copy;{{ new Date().getFullYear() }} - <strong>Izumi Araki</strong></div>
     <a href="mailto:georgecklei@gmail.com\">
       <div class="creator">created by george lei</div>
     </a>
