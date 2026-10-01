@@ -1,31 +1,46 @@
 <script scoped setup lang="ts">
-import SuperJSON from "superjson";
-import type { RemoveFromCartResponse } from "~/util/types/ApiUtil";
-import type { SOrderLineItem } from "~/util/types/CartUtil";
+import type { RemoveFromCartResponse } from "~/server/utils/ApiUtil";
+import type { SOrderLineItem } from "~/server/utils/CartUtil";
 
-const props = defineProps<{item: SOrderLineItem }>();
+const props = defineProps<{ item: SOrderLineItem }>();
+const emit = defineEmits<{ (e: "removed", uid: string): void }>();
 
+const isRemoving = ref(false);
+const orderCookie = useCookie("order", {
+  maxAge: 3600 * 24 * 7,
+});
 
-async function removeFromCart(itemId: any) {
-  console.log(itemId)
-  await useFetch<RemoveFromCartResponse>("/api/item/remove-from-cart", {
-    method: "delete",
-    body: {
-      itemId: itemId,
-      orderId: useCookie("order", {
-      maxAge: 3600 * 24 * 7
-    })
-    },    
-    transform: (value) => {
-      return SuperJSON.parse(value as unknown as string)
+async function removeFromCart(lineItemUid: string) {
+  if (isRemoving.value) return;
+  isRemoving.value = true;
+
+  try {
+    const res = await $fetch<RemoveFromCartResponse>("/api/item/remove-from-cart", {
+      method: "DELETE",
+      body: {
+        itemId: lineItemUid,
+        orderId: orderCookie.value,
+      },
+    });
+
+    if (res.respCode === 200) {
+      emit("removed", lineItemUid);
     }
-  }).then((res) => {
-    console.log("Remove : " + res);
-  })
-  .catch((err) => console.log(err))
-  .finally(() => window.location.reload());
+  } catch (err) {
+    console.error("Failed to remove item from cart:", err);
+  } finally {
+    isRemoving.value = false;
+  }
 }
+
+const itemColor = computed(() => {
+  if (!props.item.categoryColor) return "#444";
+  return props.item.categoryColor.startsWith("#")
+    ? props.item.categoryColor
+    : `#${props.item.categoryColor}`;
+});
 </script>
+
 <style scoped>
 
 .cart-items{
@@ -79,7 +94,7 @@ async function removeFromCart(itemId: any) {
   }
 </style>
 <template>
-<div class="cart-items" :style="{ backgroundColor: '#' + props.item.categoryColor }">
+<div class="cart-items" :style="{ backgroundColor: itemColor }">
             <div class="left">
               <img :src="props.item.photo"/>
             </div>
@@ -88,8 +103,15 @@ async function removeFromCart(itemId: any) {
                 <h4>{{ props.item.name }}</h4>
                 <h4>{{ props.item.variationName }}</h4>
                 <h4> {{ props.item.totalMoney }} CAD</h4>
-                <button @click="removeFromCart(props.item.uid)" id="submit" class="add-cart">
-                        Remove from Cart </button>
+                <button
+                  @click="removeFromCart(props.item.uid)"
+                  id="submit"
+                  class="add-cart"
+                  :disabled="isRemoving"
+                >
+                  {{ isRemoving ? "Removing..." : "Remove from Cart" }}
+                </button>
             </div>
         </div>
+
 </template>

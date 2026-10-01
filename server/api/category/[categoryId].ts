@@ -1,89 +1,78 @@
-import {
-  SearchCatalogItemsRequest,
-  Client,
-  Environment,
-  BatchRetrieveCatalogObjectsRequest,
-  ItemVariationLocationOverrides,
-} from "square/legacy";
-import superjson from "superjson";
+import type { Square } from "square";
 import { CategoryFinder } from "../categories";
-import ShopUtil, { Category, Item } from "~/util/types/ShopUtil";
+import ShopUtil, { type Category, type Item } from "../../utils/ShopUtil";
+import { squareClient } from "../../utils/square";
 
 export default defineEventHandler(async (event) => {
   const categoryId: string | undefined = event.context.params?.categoryId;
 
-  if (categoryId === undefined) throw new Error("Bad categoryId");
+  if (!categoryId) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid categoryId" });
+  }
 
-  const body: SearchCatalogItemsRequest = {
-    categoryIds: [categoryId],
-    sortOrder: "DESC",
-  };
+  const items: Item[] = [];
+  const photoMap = new Map<string, string[]>();
+  const photoUrlMap = new Map<string, string | null>();
+  const photoIds: string[] = [];
 
-  const photoBody: BatchRetrieveCatalogObjectsRequest = {
-    objectIds: [],
-  };
+  const category: Category | null = CategoryFinder.find(categoryId);
 
-  const api: Client = new Client({
-    accessToken: process.env.SQUARE_ACCESS_TOKEN,
-    environment: Environment.Production,
-  });
+  try {
+    const res = await squareClient.catalog.searchItems({
+      categoryIds: [categoryId],
+      sortOrder: "DESC",
+    });
 
-  var items: Item[] = [];
-  var photoMap: Map<string, string[]> = new Map();
-  var photoUrlMap: Map<string, string | null> = new Map();
+    res.items?.forEach((item: Square.CatalogObject) => {
+      if (item.type !== "ITEM") return;
+      let variations = item.itemData?.variations;
+      if (variations == null || variations == undefined) return;
 
-  var category : Category | null = CategoryFinder.find(categoryId);
+      variations = variations.filter((v: Square.CatalogObject) => {
+        if (v.type !== "ITEM_VARIATION") return false;
+        const overrides = v.itemVariationData?.locationOverrides;
+        if (overrides == null || overrides.length === 0) return false;
+        if (overrides[0].soldOut === true) return false;
+        return true;
+      });
 
-  await api.catalogApi.searchCatalogItems(body).then((res) => {
-    if (res.statusCode === 200) {
-      res.result.items?.forEach((item) => {
-        var variations = item.itemData?.variations;
-        if (variations == null || variations == undefined) return;
-        variations = variations.filter((v) => {
-          var overrides : ItemVariationLocationOverrides[] = v.itemVariationData?.locationOverrides!;
-          if (overrides == null || overrides.length == 0)
-            return false;
-          if (overrides[0].soldOut === true)
-            return false;
-          return true;
-        });
-        if (variations.length < 1) return;
-        var shopItem: Item = ShopUtil.makeItem(item);
-        shopItem.variations = variations.map(v => ShopUtil.makeVariation(v));
-        var imgIds : string[] | null | undefined = item.itemData?.imageIds;
-        if (imgIds !== null && imgIds !== undefined) {
-          photoMap.set(item.id, imgIds);
-          photoBody.objectIds.push.apply(photoBody.objectIds, imgIds);
+      if (variations.length < 1) return;
+
+      const shopItem: Item = ShopUtil.makeItem(item);
+      shopItem.variations = variations.map((v: Square.CatalogObject) => ShopUtil.makeVariation(v));
+
+      const imgIds = item.itemData?.imageIds;
+      if (item.id && imgIds && imgIds.length > 0) {
+        photoMap.set(item.id, imgIds);
+        photoIds.push(...imgIds);
+      }
+      items.push(shopItem);
+    });
+
+    if (photoIds.length > 0) {
+      const photoRes = await squareClient.catalog.batchGet({
+        objectIds: photoIds,
+      });
+
+      photoRes.objects?.forEach((pic: Square.CatalogObject) => {
+        if (pic.type === "IMAGE" && pic.id) {
+          photoUrlMap.set(pic.id, pic.imageData?.url ?? null);
         }
-        items.push(shopItem);
       });
-    }
-  });
 
-  await api.catalogApi.batchRetrieveCatalogObjects(photoBody).then((v) => {
-    if (v.statusCode === 200) {
-      v.result.objects?.forEach((pic) => {
-        var value =
-          typeof pic.imageData?.url === undefined
-            ? null
-            : (pic.imageData?.url as string);
-        photoUrlMap.set(pic.id, value);
-      });
       items.forEach((item) => {
         item.images = photoMap
           .get(item.id)
-          ?.map(
-            (imgId) => ShopUtil.makeItemPhoto(imgId, photoUrlMap.get(imgId) as string)
-          );
+          ?.map((imgId) => ShopUtil.makeItemPhoto(imgId, photoUrlMap.get(imgId) as string));
       });
     }
-  }).catch((err) => {
-    return;
-  });
-
-  if (category != null){
-  category.items = items;
+  } catch (err) {
+    console.error("Error retrieving category items from Square:", err);
   }
 
-  return superjson.stringify(category) as unknown as typeof category;
+  if (category != null) {
+    category.items = items;
+  }
+
+  return category;
 });

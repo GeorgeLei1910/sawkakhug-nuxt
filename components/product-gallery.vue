@@ -10,7 +10,7 @@
 </style>
 
 <script setup lang="ts">
-  import type { Item } from '~/util/types/ShopUtil';
+  import type { Item } from '~/server/utils/ShopUtil';
 
   const props = defineProps<{item : Item}>();
 </script>

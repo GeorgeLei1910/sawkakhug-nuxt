@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Category } from '~/util/types/ShopUtil';
+import type { Category } from '~/server/utils/ShopUtil';
     const props = defineProps<{category : Category}>();
 </script>
 

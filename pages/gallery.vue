@@ -21,19 +21,14 @@
 </style>
 
 <script setup lang="ts">
-import superjson from "superjson";
-const route = useRoute();
-const { data } = await useFetch<string[]>(`/api/gallery`, {
-  transform: (value) => {
-    return superjson.parse(value as unknown as string);
-  },
-});
+const { data } = await useFetch<string[]>("/api/gallery");
 </script>
 
 <template>
   <div class="gallery_container">
-    <div class="gallery_pictures" v-for="picture in data">
+    <div class="gallery_pictures" v-for="picture in data" :key="picture">
       <img :src="picture" />
     </div>
   </div>
 </template>
+

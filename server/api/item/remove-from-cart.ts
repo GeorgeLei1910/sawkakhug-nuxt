@@ -1,44 +1,64 @@
-import {
-  Client,
-  Environment,
-} from "square/legacy";
-import { AddToCartResponse, ApiUtils, RemoveFromCartResponse, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
-import SuperJSON from "superjson";
-const client : Client = new Client({
-  accessToken: process.env.SQUARE_ACCESS_TOKEN,
-  environment: Environment.Production
-});
+import { squareClient } from "~/server/utils/square";
+import { type RemoveFromCartResponse, SawkakhugSquareAPI } from "../../utils/ApiUtil";
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+  const lineItemUid = body?.lineItemUid || body?.itemId;
 
-  if (!body.orderId){
-    let output : RemoveFromCartResponse = {
-      respCode: 404
-    }
-    return SuperJSON.stringify(output) as unknown as typeof output;
+  if (!body?.orderId || !lineItemUid) {
+    setResponseStatus(event, 400);
+    const output: RemoveFromCartResponse = {
+      respCode: 400,
+      error: ["Missing orderId or line item identifier"],
+    };
+    return output;
   }
 
-  let currOrder = await client.ordersApi.retrieveOrder(body.orderId)
-                            .then((v) => v.result.order);
+  try {
+    const orderRes = await squareClient.orders.get({ orderId: body.orderId });
+    const currOrder = orderRes.order;
 
-  let updateResponse = await client.ordersApi.updateOrder(currOrder!.id!, {
-    order: {
-      locationId: SawkakhugSquareAPI.LOCATION_ID,
-      version: currOrder?.version
-    },
-    fieldsToClear: [`line_items[${body.itemId}]`]
-  });
-
-
-  if (updateResponse.statusCode == 200){
-    let output : RemoveFromCartResponse = {
-      respCode: 200
+    if (!currOrder) {
+      setResponseStatus(event, 404);
+      const output: RemoveFromCartResponse = {
+        respCode: 404,
+        error: ["Order not found"],
+      };
+      return output;
     }
-    return SuperJSON.stringify(output) as unknown as typeof output;
-  }else{
-    let output : RemoveFromCartResponse = {
-      respCode: 500
+
+    const updateResponse = await squareClient.orders.update({
+      orderId: currOrder.id!,
+      order: {
+        locationId: SawkakhugSquareAPI.LOCATION_ID,
+        version: currOrder.version,
+      },
+      fieldsToClear: [`line_items[${lineItemUid}]`],
+    });
+
+    if (updateResponse.order) {
+      return {
+        respCode: 200,
+        res: {
+          order: updateResponse.order,
+        },
+      } satisfies RemoveFromCartResponse;
+    } else {
+      setResponseStatus(event, 500);
+      const output: RemoveFromCartResponse = {
+        respCode: 500,
+        error: ["Failed to remove line item"],
+      };
+      return output;
     }
-    return SuperJSON.stringify(output) as unknown as typeof output;
+  } catch (err) {
+    console.error("Error removing item from cart in Square:", err);
+    setResponseStatus(event, 500);
+    const output: RemoveFromCartResponse = {
+      respCode: 500,
+      error: ["Error removing item from cart"],
+    };
+    return output;
   }
 });
+

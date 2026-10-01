@@ -1,66 +1,96 @@
-
-import { Environment, Client, CreatePaymentLinkRequest, Order } from "square/legacy";
-import { AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../../util/types/ApiUtil";
-import SuperJSON from "superjson";
-
-
-const api: Client = new Client({
-  accessToken: process.env.SQUARE_ACCESS_TOKEN,
-  environment: Environment.Production,
-});
+import type { Square } from "square";
+import { type AddToCartResponse, ApiUtils, SawkakhugSquareAPI } from "../../utils/ApiUtil";
+import { squareClient } from "~/server/utils/square";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  console.log("Got body")
-  var res : AddToCartResponse;
+
+  if (!body?.itemId) {
+    setResponseStatus(event, 400);
+    const resp: AddToCartResponse = {
+      respCode: 400,
+      error: ["Missing item ID"],
+    };
+    return resp;
+  }
 
   if (!body.orderId) {
-    return await createNewPaylink(body.itemId)
-                    .then(v => ApiUtils.makeAddToCartResponse(v.result.paymentLink!, v.result.relatedResources!.orders![0]))
-                    .then(v => SuperJSON.stringify(v) as unknown as typeof v)
-                    .catch((exc) => {
-
-                    });
-  }
-  
-
-  let currOrder = await api.ordersApi.retrieveOrder(body.orderId)
-                            .then((v) => v.result.order);
-
-  if (checkDuplicates(currOrder!, body.itemId)){
-    let resp : AddToCartResponse = {
-      respCode: 400,
-      error: ["Item Already Added"]
+    try {
+      const paylinkRes = await createNewPaylink(body.itemId);
+      const order = paylinkRes.relatedResources?.orders?.[0];
+      const resp = ApiUtils.makeAddToCartResponse(paylinkRes.paymentLink, order);
+      return resp;
+    } catch (exc) {
+      console.error("Error creating payment link:", exc);
+      setResponseStatus(event, 500);
+      const resp: AddToCartResponse = {
+        respCode: 500,
+        error: ["Failed to create checkout session"],
+      };
+      return resp;
     }
-    return SuperJSON.stringify(resp) as unknown as typeof resp;
   }
-  
 
-  let updateResponse = await api.ordersApi.updateOrder(currOrder!.id!, {
-    order : {
-      locationId : SawkakhugSquareAPI.LOCATION_ID,
-      lineItems: [{
-          quantity: "1",
-          catalogObjectId: body.itemId,
-          itemType:'ITEM'
-      }],
-      version: currOrder?.version
-  }});
+  try {
+    const orderRes = await squareClient.orders.get({ orderId: body.orderId });
+    const currOrder = orderRes.order;
 
-  if (updateResponse.statusCode == 200){
-     let resp = ApiUtils.makeAddToCartResponse(null, updateResponse.result.order!)
-     return SuperJSON.stringify(resp) as unknown as typeof resp;
-  }else{
-    let resp : AddToCartResponse = {
-      respCode: 404,
-      error: ["Can't Add Item"]
+    if (!currOrder) {
+      setResponseStatus(event, 404);
+      const resp: AddToCartResponse = {
+        respCode: 404,
+        error: ["Order not found"],
+      };
+      return resp;
     }
-    return SuperJSON.stringify(resp) as unknown as typeof resp;
+
+    if (checkDuplicates(currOrder, body.itemId)) {
+      setResponseStatus(event, 400);
+      const resp: AddToCartResponse = {
+        respCode: 400,
+        error: ["Item Already Added"],
+      };
+      return resp;
+    }
+
+    const updateResponse = await squareClient.orders.update({
+      orderId: currOrder.id!,
+      order: {
+        locationId: SawkakhugSquareAPI.LOCATION_ID,
+        lineItems: [
+          {
+            quantity: "1",
+            catalogObjectId: body.itemId,
+            itemType: "ITEM",
+          },
+        ],
+        version: currOrder.version,
+      },
+    });
+
+    if (updateResponse.order) {
+      return ApiUtils.makeAddToCartResponse(null, updateResponse.order);
+    } else {
+      setResponseStatus(event, 404);
+      const resp: AddToCartResponse = {
+        respCode: 404,
+        error: ["Can't Add Item"],
+      };
+      return resp;
+    }
+  } catch (err) {
+    console.error("Error updating order in Square:", err);
+    setResponseStatus(event, 500);
+    const resp: AddToCartResponse = {
+      respCode: 500,
+      error: ["Can't Add Item"],
+    };
+    return resp;
   }
 });
 
 async function createNewPaylink(itemId: string) {
-  let paylinkRequest: CreatePaymentLinkRequest = {
+  return await squareClient.checkout.paymentLinks.create({
     order: {
       locationId: SawkakhugSquareAPI.LOCATION_ID,
       lineItems: [
@@ -79,27 +109,10 @@ async function createNewPaylink(itemId: string) {
         cashAppPay: true,
       },
     },
-  };
-  console.log(paylinkRequest)
-  let paymentLink =
-    await api.checkoutApi.createPaymentLink(
-      paylinkRequest
-    );
-  return paymentLink;
+  });
 }
 
-function checkDuplicates(currOrder: Order, itemId: string) {
-  if (currOrder == null) return false;
-  var itemIds: string[] = [];
-  if (currOrder.lineItems == null) return false;
-  currOrder.lineItems.forEach((item) => {
-    if (item.catalogObjectId !== null) {
-      itemIds.push(item.catalogObjectId!);
-    }
-  });
-  if (itemIds.length < 1) return false;
-  if (itemIds.indexOf(itemId) != -1) {
-    return true;
-  }
-  return false;
+function checkDuplicates(currOrder: Square.Order, itemId: string): boolean {
+  return currOrder.lineItems?.some((item) => item.catalogObjectId === itemId) ?? false;
 }
+

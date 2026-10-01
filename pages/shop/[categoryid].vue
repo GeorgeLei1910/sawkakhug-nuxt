@@ -19,27 +19,23 @@
 </style>
 
 <script setup lang="ts">
-
-import type { Category } from "~/util/types/ShopUtil";
+import type { Category } from "~/server/utils/ShopUtil";
 import ProductCard from "../../components/product-card.vue";
-import superjson from 'superjson';
 
 const route = useRoute();
 const categoryId = route.params.categoryid as string;
-const {data} = await useFetch<Category>(`/api/category/${categoryId}`, {
-    transform: (value) => {
-      return superjson.parse(value as unknown as string)
-    }
-  });
-
+const { data } = await useFetch<Category>(`/api/category/${categoryId}`);
 </script>
 
 <template>
   <Cart />
   <div id="shop-layout" v-if="data != null">
-    <ProductCard v-for="item in data.items"
-      :category = data
-      :item = item
-    ></ProductCard>
+    <ProductCard
+      v-for="item in data.items"
+      :key="item.id"
+      :category="data"
+      :item="item"
+    />
   </div>
-  </template>
+</template>
+

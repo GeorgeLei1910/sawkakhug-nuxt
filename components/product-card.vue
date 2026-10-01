@@ -43,72 +43,80 @@ select {
 </style>
 
 <script scoped setup lang="ts">
-import superjson from "superjson";
-import { type Category, type Item } from "~/util/types/ShopUtil";
-import {type AddToCartResponse} from "~/util/types/ApiUtil"
+import type { Category, Item } from "~/server/utils/ShopUtil";
+import type { AddToCartResponse } from "~/server/utils/ApiUtil";
+
 const props = defineProps<{ category: Category; item: Item }>();
 
 const options = ref(props.item.variations);
-const buttonText = ref("Add To Cart");
-const buttonColor = ref("#F9BA00");
-const buttonTextColor = ref("#694E00");
+const defaultVariationId = props.item.variations?.[0]?.variationId ?? "";
+const selected = ref(defaultVariationId);
 
+type ButtonStatus = "idle" | "loading" | "success" | "error";
+const buttonStatus = ref<ButtonStatus>("idle");
+const errorMessage = ref("");
+let resetTimer: ReturnType<typeof setTimeout> | null = null;
 
-var slect : any = props.item.variations;
-if (slect != undefined){
-  slect = slect[0].variationId;
-}else{
-  slect = "";
+const buttonText = computed(() => {
+  if (buttonStatus.value === "loading") return "Adding...";
+  if (buttonStatus.value === "success") return "Added To Cart";
+  if (buttonStatus.value === "error") return errorMessage.value || "Error";
+  return "Add To Cart";
+});
+
+const buttonColor = computed(() => {
+  if (buttonStatus.value === "loading") return "#e0a800";
+  if (buttonStatus.value === "success") return "#398f47";
+  if (buttonStatus.value === "error") return "#ff6b6b";
+  return "#F9BA00";
+});
+
+const buttonTextColor = computed(() => {
+  if (buttonStatus.value === "success" || buttonStatus.value === "error") return "#FFFFFF";
+  return "#694E00";
+});
+
+const currOrderId = useCookie("order", { maxAge: 3600 * 24 * 3 });
+const paylink = useCookie("paylink", { maxAge: 3600 * 24 * 3 });
+const url = useCookie("url", { maxAge: 3600 * 24 * 3 });
+
+function setStatusWithReset(status: ButtonStatus, message = "") {
+  if (resetTimer) clearTimeout(resetTimer);
+  buttonStatus.value = status;
+  errorMessage.value = message;
+  resetTimer = setTimeout(() => {
+    buttonStatus.value = "idle";
+    errorMessage.value = "";
+  }, 2000);
 }
-const selected = ref(slect);
-const timeout = 2000;
-let currOrderId = useCookie("order", {
-  maxAge: 3600 * 24 * 3
-});
-let paylink = useCookie("paylink", {
-  maxAge: 3600 * 24 * 3
-});
-let url = useCookie("url", {
-  maxAge: 3600 * 24 * 3
-});
 
-async function addToCart(itemId: any) {
-  console.log("Clicked on " + itemId)
-  await useFetch<AddToCartResponse>("/api/item/add-to-cart", {
-    method: "put",
-    body: {
-      itemId: itemId,
-      orderId: currOrderId.value
-    },
-    transform: (value) => {
-      return superjson.parse(value as unknown as string)
+async function addToCart(itemId: string) {
+  if (!itemId || buttonStatus.value === "loading") return;
+
+  buttonStatus.value = "loading";
+
+  try {
+    const res = await $fetch<AddToCartResponse>("/api/item/add-to-cart", {
+      method: "PUT",
+      body: {
+        itemId,
+        orderId: currOrderId.value,
+      },
+    });
+
+    if (res.respCode === 200 && res.res) {
+      if (res.res.order?.id) currOrderId.value = res.res.order.id;
+      if (!paylink.value && res.res.paymentLink) paylink.value = res.res.paymentLink;
+      if (!url.value && res.res.url) url.value = res.res.url;
+      setStatusWithReset("success");
+    } else {
+      const err = res.error?.[0] || "Failed to add";
+      setStatusWithReset("error", err);
     }
-  })
-  .then((v) => {
-    console.log(v);
-    if (v === undefined) return;
-    if (v.data.value?.respCode == 200){
-    var result = v.data.value?.res
-    if (result === undefined || result === null) return null;
-    currOrderId.value = result.order?.id;
-    if (!paylink.value) paylink.value = result?.paymentLink;
-    if (!url.value) url.value = result?.url;
-      buttonText.value = "Added To Cart";
-      buttonColor.value = "#398f47";
-      buttonTextColor.value = "#FFFFFF";
-      setTimeout(function() { buttonText.value = "Add To Cart"; }, timeout);
-      setTimeout(function() { buttonColor.value = "#F9BA00"; }, timeout);
-      setTimeout(function() { buttonTextColor.value = "#694E00"; }, timeout);
-    }else{
-      buttonText.value = v.data.value!.error![0];
-      buttonColor.value = "#ff6b6b";
-      buttonTextColor.value = "#FFFFFF";
-      setTimeout(function() { buttonText.value = "Add To Cart"; }, timeout);
-      setTimeout(function() { buttonColor.value = "#F9BA00"; }, timeout);
-      setTimeout(function() { buttonTextColor.value = "#694E00"; }, timeout);
-    }
-    return v;
-  });
+  } catch (err: any) {
+    const message = err?.data?.error?.[0] || err?.data?.statusMessage || "Error adding item";
+    setStatusWithReset("error", message);
+  }
 }
 </script>
 
@@ -121,16 +129,26 @@ async function addToCart(itemId: any) {
     <table>
       <tbody>
         <tr>
-          <td><select name="item" id="color" v-model="selected">
-            <option v-for="vary in options" :value=vary.variationId> {{ vary.variationName }} ({{ vary.price }} {{ vary.currency }})</option>
-          </select></td>
+          <td>
+            <select name="item" id="color" v-model="selected">
+              <option v-for="vary in options" :key="vary.variationId" :value="vary.variationId">
+                {{ vary.variationName }} ({{ vary.price }} {{ vary.currency }})
+              </option>
+            </select>
+          </td>
         </tr>
       </tbody>
     </table>
     <p class="size"></p>
-    <button @click="addToCart(selected)" id="submit" class="add-cart" :style= "{ backgroundColor : buttonColor , color : buttonTextColor }" >
+    <button
+      @click="addToCart(selected)"
+      id="submit"
+      class="add-cart"
+      :disabled="buttonStatus === 'loading'"
+      :style="{ backgroundColor: buttonColor, color: buttonTextColor }"
+    >
       {{ buttonText }}
     </button>
   </div>
-  
 </template>
+
