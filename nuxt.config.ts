@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2026-09-30',
+  nitro: {
+    preset: 'cloudflare-module',
+  },
   modules: ['nuxt-swiper'],
   devtools: { enabled: true },
   debug: true,
