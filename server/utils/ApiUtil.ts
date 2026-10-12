@@ -37,6 +37,15 @@ export interface ListCartResponse {
   };
 }
 
+export function sanitizeBigInt<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === "bigint" ? Number(value) : value
+    )
+  );
+}
+
 export class ApiUtils {
   public static makeEditCart(itemId: string, cartId: string): EditCartRequest {
     return {
@@ -53,7 +62,7 @@ export class ApiUtils {
       res: {
         paymentLink: paylink?.id,
         url: paylink?.url,
-        order,
+        order: order ? sanitizeBigInt(order) : undefined,
       },
       respCode: 200,
     };

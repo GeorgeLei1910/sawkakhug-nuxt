@@ -1,13 +1,14 @@
 import { squareClient } from "~/server/utils/square";
-import { type RemoveFromCartResponse, SawkakhugSquareAPI } from "../../utils/ApiUtil";
+import { type RemoveFromCartResponse, SawkakhugSquareAPI, sanitizeBigInt } from "../../utils/ApiUtil";
 
 export default defineEventHandler(async (event) => {
-  // Support both body and query parameters (Cloudflare/proxies often drop bodies on DELETE)
   let body: any = {};
-  try {
-    body = await readBody(event);
-  } catch {
-    body = {};
+  if (event.method !== "GET" && event.method !== "DELETE") {
+    try {
+      body = await readBody(event);
+    } catch {
+      body = {};
+    }
   }
 
   const query = getQuery(event);
@@ -49,7 +50,7 @@ export default defineEventHandler(async (event) => {
       return {
         respCode: 200,
         res: {
-          order: currOrder,
+          order: sanitizeBigInt(currOrder),
         },
       } satisfies RemoveFromCartResponse;
     }
@@ -67,7 +68,7 @@ export default defineEventHandler(async (event) => {
       return {
         respCode: 200,
         res: {
-          order: updateResponse.order,
+          order: sanitizeBigInt(updateResponse.order),
         },
       } satisfies RemoveFromCartResponse;
     } else {
