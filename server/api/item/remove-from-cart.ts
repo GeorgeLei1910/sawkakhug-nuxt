@@ -2,10 +2,20 @@ import { squareClient } from "~/server/utils/square";
 import { type RemoveFromCartResponse, SawkakhugSquareAPI } from "../../utils/ApiUtil";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const lineItemUid = body?.lineItemUid || body?.itemId;
+  // Support both body and query parameters (Cloudflare/proxies often drop bodies on DELETE)
+  let body: any = {};
+  try {
+    body = await readBody(event);
+  } catch {
+    body = {};
+  }
 
-  if (!body?.orderId || !lineItemUid) {
+  const query = getQuery(event);
+  const orderId = body?.orderId || query?.orderId;
+  const lineItemIdentifier =
+    body?.lineItemUid || body?.itemId || query?.lineItemUid || query?.itemId;
+
+  if (!orderId || !lineItemIdentifier) {
     setResponseStatus(event, 400);
     const output: RemoveFromCartResponse = {
       respCode: 400,
@@ -15,7 +25,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const orderRes = await squareClient.orders.get({ orderId: body.orderId });
+    const orderRes = await squareClient.orders.get({ orderId });
     const currOrder = orderRes.order;
 
     if (!currOrder) {
@@ -27,13 +37,30 @@ export default defineEventHandler(async (event) => {
       return output;
     }
 
+    // Match the target item either by Square line item uid or catalogObjectId
+    const targetLineItem = currOrder.lineItems?.find(
+      (item) =>
+        item.uid === lineItemIdentifier ||
+        item.catalogObjectId === lineItemIdentifier
+    );
+
+    // If item is already not in the order, treat as successful removal
+    if (!targetLineItem || !targetLineItem.uid) {
+      return {
+        respCode: 200,
+        res: {
+          order: currOrder,
+        },
+      } satisfies RemoveFromCartResponse;
+    }
+
     const updateResponse = await squareClient.orders.update({
       orderId: currOrder.id!,
       order: {
-        locationId: SawkakhugSquareAPI.LOCATION_ID,
+        locationId: currOrder.locationId || SawkakhugSquareAPI.LOCATION_ID,
         version: currOrder.version,
       },
-      fieldsToClear: [`line_items[${lineItemUid}]`],
+      fieldsToClear: [`line_items[${targetLineItem.uid}]`],
     });
 
     if (updateResponse.order) {
@@ -51,12 +78,12 @@ export default defineEventHandler(async (event) => {
       };
       return output;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error removing item from cart in Square:", err);
     setResponseStatus(event, 500);
     const output: RemoveFromCartResponse = {
       respCode: 500,
-      error: ["Error removing item from cart"],
+      error: [err?.message || "Error removing item from cart"],
     };
     return output;
   }

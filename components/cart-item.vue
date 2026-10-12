@@ -17,6 +17,10 @@ async function removeFromCart(lineItemUid: string) {
   try {
     const res = await $fetch<RemoveFromCartResponse>("/api/item/remove-from-cart", {
       method: "DELETE",
+      query: {
+        itemId: lineItemUid,
+        orderId: orderCookie.value,
+      },
       body: {
         itemId: lineItemUid,
         orderId: orderCookie.value,
