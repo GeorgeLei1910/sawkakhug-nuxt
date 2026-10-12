@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-09-30',
   nitro: {
-    preset: 'cloudflare-module',
+    preset: process.env.NODE_ENV === 'production' ? 'cloudflare-module' : undefined,
   },
   modules: ['nuxt-swiper'],
   devtools: { enabled: true },
